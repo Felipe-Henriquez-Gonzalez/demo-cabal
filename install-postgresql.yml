@@ -1,0 +1,56 @@
+--
+- name: Configurar PostgreSQL y crear una base de datos
+  hosts: postgres_servers  # Define el grupo en tu archivo de inventario
+  become: yes
+  vars:
+    postgres_version: "15"  # Cambia según la versión deseada
+    postgres_db: "mi_base_de_datos"
+ #   postgres_user: "mi_usuario"
+ #   postgres_password: "mi_contraseña"
+    postgres_port: 5432
+
+  tasks:
+    - name: Instalar paquetes de PostgreSQL
+      ansible.builtin.package:
+        name:
+          - "postgresql-{{ postgres_version }}"
+          - "postgresql-server"
+        state: present
+
+    - name: Inicializar base de datos PostgreSQL
+      ansible.builtin.command:
+        cmd: "postgresql-setup initdb"
+        creates: "/var/lib/pgsql/{{ postgres_version }}/data/PG_VERSION"
+      when: ansible_os_family == "RedHat"
+
+    - name: Asegurar que PostgreSQL está habilitado y corriendo
+      ansible.builtin.service:
+        name: postgresql
+        state: started
+        enabled: yes
+
+    - name: Configurar autenticación en pg_hba.conf
+      ansible.builtin.lineinfile:
+        path: "/var/lib/pgsql/{{ postgres_version }}/data/pg_hba.conf"
+        regexp: "^host.*all.*all.*127.0.0.1/32.*"
+        line: "host    all             all             127.0.0.1/32            md5"
+        state: present
+
+    - name: Reiniciar el servicio de PostgreSQL
+      ansible.builtin.service:
+        name: postgresql
+        state: restarted
+
+    - name: Crear usuario de PostgreSQL
+      community.postgresql.postgresql_user:
+        name: "{{ postgres_user }}"
+        password: "{{ postgres_password }}"
+        login_host: "127.0.0.1"
+        login_user: "postgres"
+
+    - name: Crear base de datos PostgreSQL
+      community.postgresql.postgresql_db:
+        name: "{{ postgres_db }}"
+        owner: "{{ postgres_user }}"
+        login_host: "127.0.0.1"
+        login_user: "postgres"
