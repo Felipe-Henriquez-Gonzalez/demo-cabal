@@ -8,11 +8,3 @@
         name: httpd
         state: started
         enabled: yes
-
-    - name: Verificar que Apache está corriendo
-      ansible.builtin.service_facts:
-
-    - name: Mostrar estado del servicio Apache
-      debug:
-        msg: "Estado actual de Apache: {{ ansible_facts.services['httpd'].state }}"
-
