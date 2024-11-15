@@ -1,0 +1,30 @@
+---
+- name: Crear una máquina virtual en AWS
+  hosts: localhost
+  gather_facts: no
+  vars:
+#    aws_region: "us-east-1"  # Cambia la región según tus necesidades
+#    instance_type: "t2.micro"  # Tipo de instancia
+#    ami_id: "ami-0c02fb55956c7d316"  # AMI ID para la región especificada
+#    key_name: "mi-clave-aws"  # Nombre de tu par de claves
+#    security_group: "mi-grupo-seguridad"  # Nombre del grupo de seguridad
+#    instance_name: "MiInstanciaEC2"  # Nombre para etiquetar la instancia
+  tasks:
+    - name: Crear una instancia EC2 en AWS
+      amazon.aws.ec2_instance:
+        name: "{{ instance_name }}"
+        region: "{{ aws_region }}"
+        instance_type: "{{ instance_type }}"
+        image_id: "{{ ami_id }}"
+        key_name: "{{ key_name }}"
+        security_groups: 
+          - "{{ security_group }}"
+        wait: yes
+      register: ec2_instance
+
+    - name: Mostrar información de la instancia creada
+      debug:
+        msg:
+          - "Instancia creada con éxito"
+          - "ID de la instancia: {{ ec2_instance.instance_ids[0] }}"
+          - "Dirección pública: {{ ec2_instance.instances[0].public_ip_address }}"
