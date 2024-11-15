@@ -6,5 +6,5 @@
     - name: Asegurar que Apache está habilitado y corriendo
       ansible.builtin.service:
         name: httpd
-        state: started
+        state: restarted
         enabled: yes
