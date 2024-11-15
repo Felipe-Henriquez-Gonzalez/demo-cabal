@@ -1,15 +1,18 @@
 ---
-- name: reiniciar Apache
+- name: Reiniciar Apache
   hosts: web_servers
   become: yes
   tasks:
-  - name: Asegurar que Apache está habilitado y corriendo
+    - name: Asegurar que Apache está habilitado y corriendo
       ansible.builtin.service:
         name: httpd
         state: started
         enabled: yes
-  - name: Verificar que Apache está corriendo
+
+    - name: Verificar que Apache está corriendo
       ansible.builtin.service_facts:
-  - name: Mostrar estado del servicio Apache
+
+    - name: Mostrar estado del servicio Apache
       debug:
-        msg: "Estado actual de Apache: {{ ansible_facts.services httpd.state }}"
+        msg: "Estado actual de Apache: {{ ansible_facts.services['httpd'].state }}"
+
