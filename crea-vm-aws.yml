@@ -1,8 +1,6 @@
 ---
 - name: Crear una máquina virtual en AWS
-  hosts: all
-- name: Hello World Sample
-  hosts: all
+  hosts: localhost
   tasks:
     - name: crea vm
       debug:
